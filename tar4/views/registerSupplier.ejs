@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Supplier Registration</title>
+    <link rel="stylesheet" href="/style.css" />
+
+    <script>
+      function addProductField() {
+        const container = document.getElementById("productsContainer");
+        const productHTML = `
+        <div>
+          <label>Product Name:</label>
+          <input type="text" name="products[][productName]" required>
+          <label>Price:</label>
+          <input type="number" name="products[][price]" step="0.01" required>
+          <label>Minimum Quantity:</label>
+          <input type="number" name="products[][minQuantity]" required>
+        </div>
+      `;
+        container.insertAdjacentHTML("beforeend", productHTML);
+      }
+    </script>
+  </head>
+  <body>
+    <h1>New Supplier Registration</h1>
+
+    <% if (typeof errorMessage !== 'undefined') { %>
+    <p style="color: red"><%= errorMessage %></p>
+    <% } %>
+
+    <form action="/registerSupplier" method="POST">
+      <label>Company Name:</label>
+      <input type="text" name="companyName" required />
+      <br />
+
+      <label>Phone Number:</label>
+      <input type="text" name="phoneNumber" required />
+      <br />
+
+      <label>Representative Name:</label>
+      <input type="text" name="representativeName" required />
+      <br />
+
+      <label>Password:</label>
+      <input type="password" name="password" required />
+      <br />
+
+      <h3>Products:</h3>
+      <div id="productsContainer"></div>
+      <button type="button" onclick="addProductField()">Add Product</button>
+      <br />
+
+      <button type="submit">Register Supplier</button>
+    </form>
+  </body>
+</html>

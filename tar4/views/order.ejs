@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Store Owner Dashboard</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <h1>Welcome, Store Owner</h1>
+
+      <button
+        id="back-button"
+        onclick="window.location.href='/'"
+        class="back-button"
+      >
+        ⬅ Back
+      </button>
+
+      <!-- Tab navigation -->
+      <div class="tabs">
+        <div class="tab active" data-tab="order-tab">Create Order</div>
+        <div class="tab" data-tab="list-tab">Order List</div>
+      </div>
+
+      <!-- Create Order Tab -->
+      <div id="order-tab" class="tab-content active">
+        <h2>Create a New Order</h2>
+        <form action="/create-order" method="POST" id="order-form">
+          <!-- Supplier selection -->
+          <label for="companyName">Supplier:</label>
+          <select id="companyName" name="companyName" required>
+            <option value="">Select a Supplier</option>
+          </select>
+
+          <!-- Products will appear here -->
+          <h3>Add Products to Order</h3>
+          <div id="products"></div>
+
+          <button type="submit">Create Order</button>
+        </form>
+      </div>
+
+      <!-- Order List Tab -->
+      <div id="list-tab" class="tab-content">
+        <h2>Order List</h2>
+        <div id="orders-list"></div>
+        <!-- Orders render -->
+      </div>
+    </div>
+
+    <script>
+      //  Handle tab switching
+      const tabs = document.querySelectorAll(".tab");
+      const tabContents = document.querySelectorAll(".tab-content");
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          // Deactivate all tabs and tab contents
+          tabs.forEach((t) => t.classList.remove("active"));
+          tabContents.forEach((c) => c.classList.remove("active"));
+
+          // Activate the clicked tab and its content
+          tab.classList.add("active");
+          document.getElementById(tab.dataset.tab).classList.add("active");
+        });
+      });
+
+      // Load all orders when page loads
+      document.addEventListener("DOMContentLoaded", function () {
+        const ordersList = document.getElementById("orders-list");
+
+        // Fetch orders from server
+        fetch("/all-orders")
+          .then((response) => response.json())
+          .then((orders) => {
+            // If no orders found
+            if (orders.length === 0) {
+              ordersList.innerHTML =
+                "<p>No orders available at the moment.</p>";
+            } else {
+              // Render each order
+              orders.forEach((order) => {
+                const orderDiv = document.createElement("div");
+                orderDiv.classList.add("order-box");
+                orderDiv.innerHTML = `
+                  <h3>Order #${order.id}</h3>
+                  <p>Date: ${new Date(order.orderDate).toLocaleDateString(
+                    "en-IL"
+                  )}</p>
+                  <p>Status: ${order.status}</p>
+                  <ul>
+                    ${order.products
+                      .map(
+                        (product) =>
+                          `<li>${product.productName} - Quantity: ${product.quantity}</li>`
+                      )
+                      .join("")}
+                  </ul>
+                  ${
+                    order.status === "Processing"
+                      ? `<button class="complete-order-btn" data-order-id="${order.id}">Complete Order</button>`
+                      : `<p>✔ Order Confirmed</p>`
+                  }
+                `;
+                ordersList.appendChild(orderDiv);
+              });
+
+              // Add click event to "Complete Order" buttons
+              document
+                .querySelectorAll(".complete-order-btn")
+                .forEach((button) => {
+                  button.addEventListener("click", function () {
+                    const orderId = this.getAttribute("data-order-id");
+
+                    // Send request to complete the order
+                    fetch("/completeOrder", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({ orderId: orderId }),
+                    })
+                      .then((response) => response.json())
+                      .then((data) => {
+                        alert(data.message); // Show success message
+
+                        // Update button status visually
+                        this.disabled = true;
+                        this.style.backgroundColor = "#4CAF50";
+                      })
+                      .catch((error) => {
+                        console.error("Error:", error);
+                        alert("Error updating order status.");
+                      });
+                  });
+                });
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching orders:", error);
+            ordersList.innerHTML = "<p>Error loading orders.</p>";
+          });
+      });
+
+      // Load suppliers and their products when selected
+      document.addEventListener("DOMContentLoaded", function () {
+        const supplierSelect = document.getElementById("companyName");
+
+        // Fetch all suppliers
+        fetch("/suppliers")
+          .then((response) => response.json())
+          .then((suppliers) => {
+            suppliers.forEach((supplier) => {
+              const option = document.createElement("option");
+              option.value = supplier.id;
+              option.textContent = supplier.companyName;
+              supplierSelect.appendChild(option);
+            });
+          })
+          .catch((error) => console.error("Error fetching suppliers:", error));
+
+        // When a supplier is selected, load its products
+        supplierSelect.addEventListener("change", function () {
+          const companyName = this.options[this.selectedIndex].text;
+
+          if (companyName) {
+            fetch(`/suppliers/${companyName}/products`)
+              .then((response) => response.json())
+              .then((products) => {
+                const productsDiv = document.getElementById("products");
+                productsDiv.innerHTML = "";
+
+                // If no products found
+                if (products.length === 0) {
+                  productsDiv.innerHTML =
+                    "No products found for this supplier.";
+                } else {
+                  // Dynamically generate product fields
+                  products.forEach((product, index) => {
+                    const productDiv = document.createElement("div");
+                    productDiv.classList.add("product");
+                    productDiv.innerHTML = `
+                      <label for="productId-${index}">Product ID:</label>
+                      <input type="text" id="productId-${index}" name="products[${index}][productId]" value="${product.id}" readonly>
+
+                      <label for="productName-${index}">Product Name:</label>
+                      <input type="text" id="productName-${index}" name="products[${index}][productName]" value="${product.productName}" readonly>
+
+                      <label for="quantity-${index}">Quantity:</label>
+                      <input type="number" id="quantity-${index}" name="products[${index}][quantity]" required>
+                    `;
+                    productsDiv.appendChild(productDiv);
+                  });
+                }
+              })
+              .catch((error) =>
+                console.error("Error fetching products:", error)
+              );
+          }
+        });
+
+        // Submit the order
+        document
+          .getElementById("order-form")
+          .addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent default form behavior
+
+            const formData = new FormData(this);
+            const data = {};
+            const supplierId = supplierSelect.value;
+
+            if (isNaN(supplierId) || supplierId === "") {
+              alert("Please select a supplier.");
+              return;
+            }
+
+            // Parse form data into JSON
+            formData.forEach((value, key) => {
+              const indexMatch = key.match(/\[(\d+)\]/);
+              if (indexMatch) {
+                const index = indexMatch[1];
+                if (!data.products) data.products = [];
+                if (!data.products[index]) data.products[index] = {};
+
+                if (key.includes("productId"))
+                  data.products[index].productId = value;
+                if (key.includes("productName"))
+                  data.products[index].productName = value;
+                if (key.includes("quantity"))
+                  data.products[index].quantity = value;
+              }
+            });
+
+            const orderData = {
+              supplierId: supplierId,
+              products: data.products,
+            };
+
+            // Send the order to the server
+            fetch("/create-order", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(orderData),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.error) {
+                  alert(data.error);
+                } else if (data.message) {
+                  alert(data.message);
+
+                  // Switch to order list tab and refresh the page
+                  document.querySelector('.tab[data-tab="list-tab"]').click();
+                  location.reload();
+                }
+              })
+              .catch((error) => {
+                console.error("Error submitting order:", error);
+                alert("Error submitting the order.");
+              });
+          });
+      });
+    </script>
+  </body>
+</html>

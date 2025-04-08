@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="he">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Supplier login</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <h1>Welcome supplier</h1>
+
+    <!-- Button for logging in with an existing user -->
+    <form action="/loginSupplier" method="POST">
+      <input
+        type="text"
+        name="companyName"
+        placeholder="Company name"
+        required
+      />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">login</button>
+    </form>
+
+    <!-- Button for new supplier registration -->
+    <button onclick="window.location.href='/registerSupplier'">
+      Register supplier
+    </button>
+  </body>
+</html>

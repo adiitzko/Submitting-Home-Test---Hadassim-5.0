@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="he">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Supplier Orders</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <h1>Your Orders</h1>
+
+    <button
+      id="back-button"
+      onclick="window.location.href='/'"
+      class="back-button"
+    >
+      ⬅ Back
+    </button>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Order id</th>
+          <th>Order date</th>
+          <th>Status</th>
+          <th>Products</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.forEach(order => { %>
+        <tr>
+          <td><%= order.id %></td>
+          <td><%= order.orderDate.toISOString().split('T')[0] %></td>
+          <td><%= order.status %></td>
+          <td>
+            <ul>
+              <% order.products.forEach(product => { %>
+              <li>
+                <%= product.productName %> - quantity: <%= product.quantity %>
+              </li>
+              <% }) %>
+            </ul>
+          </td>
+          <td>
+            <% if (order.status === 'Pending') { %>
+            <form action="/updateOrderStatus" method="POST">
+              <input type="hidden" name="orderId" value="<%= order.id %>" />
+              <button type="submit">Confirm Order</button>
+            </form>
+            <% } %>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </body>
+</html>

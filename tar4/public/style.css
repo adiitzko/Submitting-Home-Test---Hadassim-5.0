@@ -1,0 +1,184 @@
+@import url("https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap");
+
+:root {
+  --green: #4caf50;
+  --light-green: #8bc34a;
+  --yellow: #ffd600;
+  --light-yellow: #ffeb3b;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  direction: rtl;
+  font-size: 16px;
+}
+
+body {
+  font-family: "Rubik", sans-serif;
+  background-color: #f8fff0;
+  padding: 20px;
+  color: #333;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--green);
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.login-container,
+.dashboard-container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 25px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+}
+
+.login-container {
+  max-width: 500px;
+  text-align: center;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+label {
+  font-weight: 500;
+  margin-bottom: 5px;
+  display: block;
+}
+
+input,
+select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 100%;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--green);
+}
+
+button {
+  background-color: var(--green);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:hover {
+  background-color: #388e3c;
+}
+
+button[type="submit"] {
+  background-color: var(--yellow);
+  color: #333;
+}
+
+button[type="submit"]:hover {
+  background-color: #fbc02d;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #f1f1f1;
+  margin: 0 5px;
+  border-radius: 5px;
+}
+
+.tab.active {
+  background-color: var(--light-green);
+  color: white;
+}
+
+.tab-content {
+  display: none;
+  padding: 20px;
+  background-color: white;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.product,
+#products div,
+#productsContainer > div {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  background-color: #fafafa;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+thead {
+  background-color: var(--green);
+  color: white;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: right;
+  border-bottom: 1px solid #ddd;
+}
+
+@media (max-width: 768px) {
+  .login-container,
+  .dashboard-container {
+    padding: 15px;
+  }
+
+  button {
+    padding: 8px 12px;
+  }
+}
+
+.error-message {
+  color: #e53935;
+  background-color: #ffebee;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+}
+
+.back-button {
+  background-color: #eee;
+  color: #333;
+  margin-bottom: 20px;
+}
